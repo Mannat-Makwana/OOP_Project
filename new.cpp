@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 
@@ -13,27 +15,29 @@ private:
     double price;
 
 public:
-    Product(int i, string n, int q, double p){
-        id = i;
-        name = n;
-        quantity = q;
-        price = p;
-    } 
-    
+    Product(int id, string name, int quantity, double price)
+        : id(id), name(name), quantity(quantity), price(price) {
+    }
+
 
     int getId() const { return id; }
     string getName() const { return name; }
     int getQuantity() const { return quantity; }
     double getPrice() const { return price; }
 
+
     string toCSV() const {
         return to_string(id) + "," + name + "," + to_string(quantity) + "," + to_string(price);
     }
 
     void display() const {
-        cout << id << "\t" << name << "\t" << quantity << "\t" << price << endl;
+        cout << left << setw(10) << id
+             << setw(20) << name
+             << setw(10) << quantity
+             << setw(10) << fixed << setprecision(2) << price << endl;
     }
 };
+
 
 class Inventory {
 private:
@@ -55,35 +59,43 @@ public:
         cout << "Enter Price: ";
         cin >> price;
 
-        products.push_back(Product(id, name, quantity, price));
+        Product newProduct(id, name, quantity, price);
+        products.push_back(newProduct);
+
         cout << "\nProduct added successfully!\n";
     }
 
     void displayAll() {
         if (products.empty()) {
-            cout << "\nNo products in inventory.\n";
+            cout << "\n  No products in inventory.\n";
             return;
         }
 
-        cout << "\nInventory List:\n";
-        cout << "ID\tName\tQuantity\tPrice\n";
-        cout << "----------------------------------------\n";
-        for (const Product& p : products)
-            p.display();
-            cout<<endl;
+        cout << "\n---------------------- INVENTORY LIST ----------------------\n";
+        cout << left << setw(10) << "ID" 
+             << setw(20) << "Name"
+             << setw(10) << "Quantity"
+             << setw(10) << "Price" << endl;
+        cout << "-----------------------------------------------------------\n";
 
+        for (const auto& p : products)
+            p.display();
+
+        cout << "-----------------------------------------------------------\n";
+        
         cout << "Total Products: " << products.size() << endl;
     }
 
     void saveToCSV(const string& filename = "inventory.csv") {
         ofstream file(filename);
+
         if (!file) {
-            cout << "\nError opening file for writing.\n";
+            cerr << "\n Error opening file for writing.\n";
             return;
         }
 
         file << "ID,Name,Quantity,Price\n";
-        for (const Product& p : products)
+        for (const auto& p : products)
             file << p.toCSV() << "\n";
 
         file.close();
@@ -98,23 +110,25 @@ public:
         }
 
         string line;
-        getline(file, line); 
+        getline(file, line); // skip header
 
         while (getline(file, line)) {
             if (line.empty()) continue;
+            stringstream ss(line);
+            string idStr, name, quantityStr, priceStr;
 
-            size_t pos1 = line.find(',');
-            size_t pos2 = line.find(',', pos1 + 1);
-            size_t pos3 = line.find(',', pos2 + 1);
+            if (!getline(ss, idStr, ',')) continue;
+            if (!getline(ss, name, ',')) continue;
+            if (!getline(ss, quantityStr, ',')) continue;
+            if (!getline(ss, priceStr, ',')) continue;
 
-            int id = stoi(line.substr(0, pos1));
-            string name = line.substr(pos1 + 1, pos2 - pos1 - 1);
-            int quantity = stoi(line.substr(pos2 + 1, pos3 - pos2 - 1));
-            double price = stod(line.substr(pos3 + 1));
+            int id = stoi(idStr);
+            int quantity = stoi(quantityStr);
+            double price = stod(priceStr);
 
-            products.push_back(Product(id, name, quantity, price));
+            Product p(id, name, quantity, price);
+            products.push_back(p);
         }
-
         file.close();
     }
 
@@ -138,7 +152,6 @@ public:
                 if (it->getId() == delId) {
                     products.erase(it);
                     cout << "Product with ID " << delId << " deleted successfully.\n";
-                    saveToCSV();
                     found = true;
                     break;
                 }
@@ -151,7 +164,6 @@ public:
                 if (it->getName() == delName) {
                     products.erase(it);
                     cout << "Product with Name \"" << delName << "\" deleted successfully.\n";
-                    saveToCSV();
                     found = true;
                     break;
                 }
@@ -183,12 +195,23 @@ int main() {
         cin >> choice;
 
         switch (choice) {
-            case 1: inventory.addProduct(); break;
-            case 2: inventory.displayAll(); break;
-            case 3: inventory.saveToCSV(); break;
-            case 4: inventory.deleteProduct(); break;
-            case 5: cout << "\nExiting... Goodbye!\n"; break;
-            default: cout << "\nInvalid choice. Try again.\n";
+        case 1:
+            inventory.addProduct();
+            break;
+        case 2:
+            inventory.displayAll();
+            break;
+        case 3:
+            inventory.saveToCSV();
+            break;
+        case 4:
+            inventory.deleteProduct();
+            break;
+        case 5:
+            cout << "\nExiting... Goodbye!\n";
+            break;
+        default:
+            cout << "\n Invalid choice. Try again.\n";
         }
 
     } while (choice != 5);
