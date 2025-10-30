@@ -281,14 +281,14 @@ public:
         }
 
         string line;
-        getline(file, line); // skip header
+        getline(file, line); 
         if (file.peek() == EOF) {
             cout << "\nNo transactions to display.\n";
             return;
         }
 
         cout << "\nTransaction History:\n";
-        cout << "ID\tProduct Name\tQty Sold\tSold To\tRevenue\tDate of Selling\n";
+        cout << "ID\tP_Name\tQty_Sold\tSold_To\tRevenue\tDate of Selling\n";
         cout << "---------------------------------------------------------------\n";
 
         while (getline(file, line)) {
@@ -311,6 +311,17 @@ public:
 
         file.close();
     }
+
+    void clearTransactions() {
+        ofstream file("transactions.csv");
+        if (file) {
+            file << "ID,P_Name,Qty_Sold,Sold_To,Revenue,Date_of_Selling\n";
+            file.close();
+            cout << "\nTransaction history cleared successfully!\n";
+        } else {
+            cout << "\nError opening transactions file for clearing.\n";
+        }
+    }
 };
 
 int main() {
@@ -327,8 +338,9 @@ int main() {
         cout << "\n5. Edit Product";
         cout << "\n6. Sell Product";
         cout << "\n7. Check Low Stock";
-        cout << "\n8. Exit";
-        cout << "\n9. View Transaction History";
+        cout << "\n8. View Transaction History";
+        cout << "\n9. Clear Transaction History";
+        cout << "\n10. Exit";
         cout << "\nEnter your choice: ";
         cin >> choice;
 
@@ -340,12 +352,13 @@ int main() {
             case 5: inventory.editProduct(); break;
             case 6: inventory.sellProduct(); break;
             case 7: inventory.checkLowStock(); break;
-            case 8: cout << "\nExiting... Goodbye!\n"; break;
-            case 9: inventory.displayTransactions(); break;
+            case 8: inventory.displayTransactions(); break;
+            case 9: inventory.clearTransactions(); break;
+            case 10: cout << "\nExiting... Goodbye!\n"; break;
             default: cout << "\nInvalid choice. Try again.\n";
         }
 
-    } while (choice != 8);
+    } while (choice != 10);
 
     return 0;
 }
