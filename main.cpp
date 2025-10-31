@@ -32,7 +32,7 @@ public:
     }
 
     void display() const {
-        cout << id << "\t" << name << "\t" << quantity << "\t" << price << endl;
+        cout << id << "\t\t" << name << "\t\t" << quantity << "\t\t" << price << endl;
     }
 };
 
@@ -75,8 +75,8 @@ public:
         }
 
         cout << "\nInventory List:\n";
-        cout << "ID\tName\tQuantity\tPrice\n";
-        cout << "----------------------------------------\n";
+        cout << "ID\t\tName\t\tQuantity\t\tPrice\n";
+        cout << "------------------------------------------------------------\n";
         for (const Product& p : products)
             p.display();
             cout<<endl;
@@ -212,6 +212,47 @@ public:
         cout << "\nProduct not found.\n";
     }
 
+    void search_Product(){
+        int user;
+        cout<<"Do you want to search by 1.Name or 2.ID ? :  ";
+        cin>>user;
+        if(user == 1){
+            string name;
+            cout<<"Enter the Name of the Product: ";
+            cin>>name;
+            for(const Product& p : products){
+                if(p.getName()==name){
+                    cout<<"\n-------Product Details--------\n";
+                    cout<<"Product ID: "<<p.getId()<<endl;
+                    cout<<"Product Name: "<<p.getName()<<endl;
+                    cout<<"Product Quantity: "<<p.getQuantity()<<endl;
+                    cout<<"Product Price: "<<p.getPrice()<<endl;
+                    return;
+                }
+            }
+            cout<<"Product with Name "<<name<<" is not found"<<endl;
+        }
+        else if(user == 2){
+            int id;
+            cout<<"Enter the ID of the Product: ";
+            cin>>id;
+            for(const Product& p : products){
+                if(p.getId()==id){
+                    cout<<"\n-------Product Details--------";
+                    cout<<"Product ID: "<<p.getId()<<endl;
+                    cout<<"Product Name: "<<p.getName()<<endl;
+                    cout<<"Product Quantity: "<<p.getQuantity()<<endl;
+                    cout<<"Product Price: "<<p.getPrice()<<endl;
+                    return;
+                }
+            }
+            cout<<"Product with ID "<<id<<" is not found"<<endl;
+        }
+        else{
+            cout<<"Please enter a valid input....";
+        }
+    }
+
     void sellProduct() {
         if (products.empty()) {
             cout << "\nNo products available for sale.\n";
@@ -288,8 +329,8 @@ public:
         }
 
         cout << "\nTransaction History:\n";
-        cout << "ID\tP_Name\tQty_Sold\tSold_To\tRevenue\tDate of Selling\n";
-        cout << "---------------------------------------------------------------\n";
+        cout << "|ID\t|P_Name\t|Qty_Sold\t|Sold_To\t|Revenue\t|Date of Selling|\n";
+        cout << "-------------------------------------------------------------------------------\n";
 
         while (getline(file, line)) {
             if (line.empty()) continue;
@@ -306,7 +347,7 @@ public:
             string revenue = line.substr(pos4 + 1, pos5 - pos4 - 1);
             string date = line.substr(pos5 + 1);
 
-            cout << id << "\t" << name << "\t" << qty << "\t" << buyer << "\t" << revenue << "\t" << date << "\n";
+            cout << id << "\t" << name << "\t" << qty << "\t\t" << buyer << "\t\t" << revenue << "\t\t" << date << "|\n";
         }
 
         file.close();
@@ -336,11 +377,12 @@ int main() {
         cout << "\n3. Save Data to CSV";
         cout << "\n4. Delete Product";
         cout << "\n5. Edit Product";
-        cout << "\n6. Sell Product";
-        cout << "\n7. Check Low Stock";
-        cout << "\n8. View Transaction History";
-        cout << "\n9. Clear Transaction History";
-        cout << "\n10. Exit";
+        cout << "\n6. Search Product";
+        cout << "\n7. Sell Product";
+        cout << "\n8. Check Low Stock";
+        cout << "\n9. View Transaction History";
+        cout << "\n10. Clear Transaction History";
+        cout << "\n11. Exit";
         cout << "\nEnter your choice: ";
         cin >> choice;
 
@@ -350,15 +392,16 @@ int main() {
             case 3: inventory.saveToCSV(); break;
             case 4: inventory.deleteProduct(); break;
             case 5: inventory.editProduct(); break;
-            case 6: inventory.sellProduct(); break;
-            case 7: inventory.checkLowStock(); break;
-            case 8: inventory.displayTransactions(); break;
-            case 9: inventory.clearTransactions(); break;
-            case 10: cout << "\nExiting... Goodbye!\n"; break;
+            case 6: inventory.search_Product(); break;
+            case 7: inventory.sellProduct(); break;
+            case 8: inventory.checkLowStock(); break;
+            case 9: inventory.displayTransactions(); break;
+            case 10: inventory.clearTransactions(); break;
+            case 11: cout << "\nExiting... Goodbye!\n"; break;
             default: cout << "\nInvalid choice. Try again.\n";
         }
 
-    } while (choice != 10);
+    } while (choice != 11);
 
     return 0;
 }
